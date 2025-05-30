@@ -1,3 +1,10 @@
+using LibraryGraphQL.Api.Data;
+using LibraryGraphQL.Api.Extensions;
+using LibraryGraphQL.Api.GraphQL.Mutations;
+using LibraryGraphQL.Api.GraphQL.Queries;
+using LibraryGraphQL.Api.GraphQL.Types;
+using Microsoft.EntityFrameworkCore;
+
 namespace LibraryGraphQL.Api
 {
     public class Program
@@ -6,35 +13,33 @@ namespace LibraryGraphQL.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddAuthorization();
+            // Dodaj kontekst EF Core i SQLite
+            builder.Services.AddDbContext<LibraryDbContext>(options =>
+                options.UseSqlite("Data Source=LibraryGraphQL.db"));
+
+            // Dodaj AutoMapper i serwisy
+            builder.Services.AddApplicationServices();
+
+            // GraphQL konfiguracja
+            builder.Services
+                .AddGraphQLServer()
+                .AddQueryType<Query>()
+                .AddMutationType<Mutation>()
+                .AddType<BookType>()
+                .AddType<AuthorType>();
 
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-            var summaries = new[]
+            // Migracja + seeding danych
+            using (var scope = app.Services.CreateScope())
             {
-                "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-            };
+                var dbContext = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
+                dbContext.Database.Migrate();
+                LibrarySeeder.Seed(dbContext);
+            }
 
-            app.MapGet("/weatherforecast", (HttpContext httpContext) =>
-            {
-                var forecast = Enumerable.Range(1, 5).Select(index =>
-                    new WeatherForecast
-                    {
-                        Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                        TemperatureC = Random.Shared.Next(-20, 55),
-                        Summary = summaries[Random.Shared.Next(summaries.Length)]
-                    })
-                    .ToArray();
-                return forecast;
-            });
+            app.MapGraphQL();
 
             app.Run();
         }
