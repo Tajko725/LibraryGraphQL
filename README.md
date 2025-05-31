@@ -56,6 +56,7 @@ Można testować np. w Banana Cake Pop ([https://chillicream.com/docs/nitro/gett
 ---
 
 ## 🧪 Przykładowe zapytanie GraphQL
+Skorzystać można z **https://localhost:7046/graphql/**
 
 ```graphql
 query {
@@ -69,7 +70,92 @@ query {
 }
 ```
 
+Z wynikiem:
+```json
+{
+  "data": {
+    "books": [
+      {
+        "title": "C# w praktyce",
+        "author": {
+          "name": "Jan Kowalski"
+        }
+      },
+      {
+        "title": "GraphQL dla zaawansowanych",
+        "author": {
+          "name": "Anna Nowak"
+        }
+      }
+    ]
+  }
+}
+```
+
 ---
+
+## 🛠️ Generowanie klienta GraphQL
+
+Aby poprawnie wygenerować klienta GraphQL dla projektu **LibraryGraphQL.Client**, wykonaj poniższe kroki:
+
+### ✅ Wymagania:
+- Projekt API (serwer GraphQL) **musi być uruchomiony** pod adresem `https://localhost:7046/graphql`
+- Musisz mieć zainstalowany pakiet StrawberryShake CLI:
+
+```
+dotnet tool install StrawberryShake.Tools --global
+```
+
+---
+
+### 🔧 Kroki:
+Uruchom plik **graphql-generate.ps1** lub postępuj zgodnie z poniższymi krokami.
+
+1. **Zainicjalizuj schemat GraphQL (tylko raz):**
+   ```bash
+   dotnet graphql init https://localhost:7046/graphql
+   ```
+   To polecenie wygeneruje pliki:
+   - `.graphqlrc.json`
+   - `schema.graphql`
+   - `schema.extensions.graphql`
+
+2. **Popraw nazwę klienta w `.graphqlrc.json`**
+
+   Otwórz `.graphqlrc.json` i zamień:
+
+   ```json
+   "name": "LibraryGraphQL.Client"   ← ❌ niepoprawne
+   ```
+
+   na:
+
+   ```json
+   "name": "LibraryGraphQL_Client"   ← ✅ poprawne
+   ```
+
+   > ⚠️ Kropki (`.`) w nazwie klienta powodują błędne generowanie plików — należy je zastąpić podkreśleniami (`_`).
+
+3. **Wygeneruj klienta:**
+   ```bash
+   dotnet graphql generate
+   ```
+
+   Po wykonaniu komendy pojawi się folder `Generated/` z m.in.:
+
+   ```
+   Generated/DependencyInjection/ServiceCollectionExtensions.cs
+   ```
+
+---
+
+## 🔌 Rejestracja klienta w Blazor WASM (`Program.cs`):
+
+```csharp
+builder.Services
+    .AddLibraryGraphQL_Client()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:7046/graphql"));
+```
 
 ## ✨ Status
 
