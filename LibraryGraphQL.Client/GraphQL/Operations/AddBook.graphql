@@ -1,0 +1,6 @@
+﻿mutation AddBook($title: String!, $year: Int!, $authorId: Int!) {
+  addBook(title: $title, year: $year, authorId: $authorId) {
+    id
+    title
+  }
+}

@@ -13,7 +13,7 @@ namespace LibraryGraphQL.Api.GraphQL.Queries
         /// </summary>
         /// <param name="bookService">Serwis do obsługi książek.</param>
         /// <returns>Lista książek z autorami.</returns>
-        public async Task<IEnumerable<Book>> GetBooks([Service] IBookService bookService)
+        public async Task<IEnumerable<Book>> GetBooksAsync([Service] IBookService bookService)
         {
             // Pobierz wszystkie książki z serwisu, łącznie z autorami
             return await bookService.GetAllAsync();
@@ -25,7 +25,7 @@ namespace LibraryGraphQL.Api.GraphQL.Queries
         /// <param name="id">Identyfikator książki.</param>
         /// <param name="bookService">Serwis do obsługi książek.</param>
         /// <returns>Obiekt książki lub null.</returns>
-        public async Task<Book?> GetBookById(int id, [Service] IBookService bookService)
+        public async Task<Book?> GetBookByIdAsync(int id, [Service] IBookService bookService)
         {
             // Pobierz książkę po identyfikatorze
             return await bookService.GetByIdAsync(id);
@@ -36,7 +36,7 @@ namespace LibraryGraphQL.Api.GraphQL.Queries
         /// </summary>
         /// <param name="authorService">Serwis do obsługi autorów.</param>
         /// <returns>Lista autorów z przypisanymi książkami.</returns>
-        public async Task<IEnumerable<Author>> GetAuthors([Service] IAuthorService authorService)
+        public async Task<IEnumerable<Author>> GetAuthorsAsync([Service] IAuthorService authorService)
         {
             // Pobierz wszystkich autorów
             return await authorService.GetAllAsync();

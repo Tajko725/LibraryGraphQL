@@ -16,16 +16,17 @@ namespace LibraryGraphQL.Api.GraphQL.Types
             descriptor.Field(a => a.Name).Description("Imię i nazwisko autora.");
 
             descriptor.Field(a => a.Books)
-                .ResolveWith<AuthorResolvers>(r => r.GetBooks(default!, default!))
+                .ResolveWith<AuthorResolvers>(r => r.GetBooksAsync(default!, default!))
                 .Description("Lista książek napisanych przez tego autora.");
         }
 
         private class AuthorResolvers
         {
-            public IEnumerable<Book> GetBooks(Author author, [Service] IBookService bookService)
+            public async Task<IEnumerable<Book>> GetBooksAsync([Parent] Author author, [Service] IBookService bookService)
             {
                 // Pobranie książek powiązanych z autorem
-                return bookService.GetAllAsync().Result.Where(b => b.AuthorId == author.Id);
+                var allBooks = await bookService.GetAllAsync();
+                return allBooks.Where(b => b.AuthorId == author.Id);
             }
         }
     }

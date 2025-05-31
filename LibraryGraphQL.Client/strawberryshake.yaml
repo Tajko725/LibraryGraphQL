@@ -1,0 +1,9 @@
+﻿schema:
+  - https://localhost:7046/graphql  # ← lub Twój prawidłowy adres
+
+documents:
+  - GraphQL/**/*.graphql
+
+namespace: LibraryGraphQL_Client
+client: LibraryGraphQLClient
+output: Generated

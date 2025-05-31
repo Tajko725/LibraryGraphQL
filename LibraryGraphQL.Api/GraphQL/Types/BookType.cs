@@ -26,16 +26,16 @@ namespace LibraryGraphQL.Api.GraphQL.Types
 
             // Pole: Author – relacja
             descriptor.Field(b => b.Author)
-                .ResolveWith<BookResolvers>(r => r.GetAuthor(default!, default!))
+                .ResolveWith<BookResolvers>(r => r.GetAuthorAsync(default!, default!))
                 .Description("Autor tej książki.");
         }
 
         private class BookResolvers
         {
-            public Author GetAuthor(Book book, [Service] IAuthorService authorService)
+            public async Task<Author?> GetAuthorAsync([Parent] Book book, [Service] IAuthorService authorService)
             {
                 // Pobranie autora dla danej książki
-                return authorService.GetByIdAsync(book.AuthorId).Result;
+                return await authorService.GetByIdAsync(book.AuthorId);
             }
         }
     }
